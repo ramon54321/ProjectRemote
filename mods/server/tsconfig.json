@@ -1,0 +1,32 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@shared": ["../shared/src"],
+      "@shared/*": ["../shared/src/*"],
+      "@networking": ["../networking/src"],
+      "@networking/*": ["../networking/src/*"],
+      "@serialization": ["../serialization/src"],
+      "@serialization/*": ["../serialization/src/*"],
+      "@sync": ["../sync/src"],
+      "@sync/*": ["../sync/src/*"],
+      "@state-machine": ["../state-machine/src"],
+      "@state-machine/*": ["../state-machine/src/*"],
+      "@events": ["../events/src"],
+      "@events/*": ["../events/src/*"],
+      "@core": ["../core/src"],
+      "@core/*": ["../core/src/*"],
+    }
+  },
+  "references": [{ "path": "../shared" }, { "path": "../networking" }, { "path": "../serialization" }, { "path": "../sync" }, { "path": "../state-machine" }, { "path": "../events" }, { "path": "../core" }],
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.test.ts"
+  ]
+}

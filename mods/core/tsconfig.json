@@ -1,0 +1,22 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@shared": ["../shared/src"],
+      "@shared/*": ["../shared/src/*"],
+      "@events": ["../events/src"],
+      "@events/*": ["../events/src/*"],
+    }
+  },
+  "references": [{ "path": "../shared" }, { "path": "../events" }],
+  "include": [
+    "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./src/**/*.test.ts"
+  ]
+}

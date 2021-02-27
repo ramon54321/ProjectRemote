@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@serialization": ["../serialization/src"],
+      "@serialization/*": ["../serialization/src/*"],
+      "@sync": ["../sync/src"],
+      "@sync/*": ["../sync/src/*"]
+    }
+  },
+  "references": [{ "path": "../serialization" }, { "path": "../sync" }],
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
+}
