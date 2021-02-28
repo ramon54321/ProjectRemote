@@ -6,6 +6,8 @@
     "rootDir": "./src",
     "baseUrl": ".",
     "paths": {
+      "@core": ["../core/src"],
+      "@core/*": ["../core/src/*"],
       "@shared": ["../shared/src"],
       "@shared/*": ["../shared/src/*"],
       "@networking": ["../networking/src"],
@@ -16,11 +18,13 @@
       "@sync/*": ["../sync/src/*"]
     }
   },
-  "references": [{ "path": "../shared" }, { "path": "../networking" }, { "path": "../serialization" }, { "path": "../sync" }],
-  "include": [
-    "./src/**/*.ts"
+  "references": [
+    { "path": "../core" },
+    { "path": "../shared" },
+    { "path": "../networking" },
+    { "path": "../serialization" },
+    { "path": "../sync" }
   ],
-  "exclude": [
-    "./src/**/*.test.ts"
-  ]
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
 }

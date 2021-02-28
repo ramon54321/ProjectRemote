@@ -19,14 +19,18 @@
       "@events": ["../events/src"],
       "@events/*": ["../events/src/*"],
       "@core": ["../core/src"],
-      "@core/*": ["../core/src/*"],
+      "@core/*": ["../core/src/*"]
     }
   },
-  "references": [{ "path": "../shared" }, { "path": "../networking" }, { "path": "../serialization" }, { "path": "../sync" }, { "path": "../state-machine" }, { "path": "../events" }, { "path": "../core" }],
-  "include": [
-    "./src/**/*.ts"
+  "references": [
+    { "path": "../shared" },
+    { "path": "../networking" },
+    { "path": "../serialization" },
+    { "path": "../sync" },
+    { "path": "../state-machine" },
+    { "path": "../events" },
+    { "path": "../core" }
   ],
-  "exclude": [
-    "./src/**/*.test.ts"
-  ]
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
 }

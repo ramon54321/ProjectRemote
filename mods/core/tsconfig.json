@@ -10,13 +10,13 @@
       "@shared/*": ["../shared/src/*"],
       "@events": ["../events/src"],
       "@events/*": ["../events/src/*"],
+      "@serialization": ["../serialization/src"],
+      "@serialization/*": ["../serialization/src/*"],
+      "@sync": ["../sync/src"],
+      "@sync/*": ["../sync/src/*"]
     }
   },
-  "references": [{ "path": "../shared" }, { "path": "../events" }],
-  "include": [
-    "./src/**/*.ts"
-  ],
-  "exclude": [
-    "./src/**/*.test.ts"
-  ]
+  "references": [{ "path": "../shared" }, { "path": "../events" }, { "path": "../serialization" }, { "path": "../sync" }],
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
 }

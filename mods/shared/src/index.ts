@@ -1,4 +1,3 @@
-import { NetworkState } from './NetworkState'
 import { ClientActions } from './ClientActions'
 
 type ClientAction<T extends keyof ClientActions> = {
@@ -49,5 +48,3 @@ export function replaceObject(target: object, value: object) {
     }
   }
 }
-
-export { NetworkState }

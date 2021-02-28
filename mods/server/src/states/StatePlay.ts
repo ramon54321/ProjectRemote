@@ -1,7 +1,7 @@
-import { ServerEvents, ClientEvents, NetworkState, LogicCore } from '@shared'
+import { ServerEvents, ClientEvents, LogicCore } from '@shared'
 import { NetServer, Connection, NetServerNotifications } from '@networking'
 import { State, ExtendedStates } from '@state-machine'
-import { LogicCore as LogicCoreImpl } from '@core'
+import { NetworkState, LogicCore as LogicCoreImpl } from '@core'
 import { Events } from '@events'
 import { States } from './States'
 
