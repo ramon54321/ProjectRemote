@@ -1,7 +1,10 @@
 import { LogicCoreBase } from './LogicCoreBase'
 
-export class LogicCoreMain extends LogicCoreBase {
+
+
+export class LogicCore extends LogicCoreBase {
   tick(tickNumber: number): void {
-    console.log('Ticking from logic core 2')
+    console.log('Tick', tickNumber)
+    
   }
 }

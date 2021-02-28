@@ -1,7 +1,7 @@
 import { ServerEvents, ClientEvents, NetworkState, LogicCore } from '@shared'
 import { NetServer, Connection, NetServerNotifications } from '@networking'
 import { State, ExtendedStates } from '@state-machine'
-import { LogicCoreMain } from '@core'
+import { LogicCore as LogicCoreImpl } from '@core'
 import { Events } from '@events'
 import { States } from './States'
 
@@ -26,7 +26,7 @@ export class StatePlay extends State<States> {
     })
     this.networkNotificationEvents.open()
     this.playEvents = new Events<PlayEvents>()
-    this.logicCore = new LogicCoreMain(this.state, this.network)
+    this.logicCore = new LogicCoreImpl(this.state, this.network)
     this.logicCore.open()
     this.tickHandle = setInterval(() => this.onTick(), 1000)
     await this.playEvents.for('gameover')
@@ -44,7 +44,7 @@ export class StatePlay extends State<States> {
   }
   private tickNumber = 0
   private onTick() {
-    this.logicCore.tick(this.tickNumber, this.state)
+    this.logicCore.tick(this.tickNumber)
     sendDeltaState(this.network, this.state)
     this.tickNumber++
   }

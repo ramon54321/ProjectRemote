@@ -31,7 +31,7 @@ export interface ServerEvents {
 export interface LogicCore {
   open(): void
   close(): void
-  tick(tickNumber: number, state: NetworkState): void
+  tick(tickNumber: number): void
 }
 
 export type Actions<O> = {

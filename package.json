@@ -13,6 +13,7 @@
     "clean:serialization": "tsc --build --clean mods/serialization",
     "clean:sync": "tsc --build --clean mods/sync",
     "clean": "tsc --build --clean mods/core mods/server mods/client mods/events mods/state-machine mods/dirt-registry mods/shared mods/networking mods/sync && rm -rf mods/core/dist mods/server/dist mods/client/dist mods/events/dist mods/state-machine/dist mods/dirt-registry/dist mods/shared/dist mods/networking/dist mods/serialization/dist mods/sync/dist",
+    "build:readme": "md-to-pdf README.md",
     "build:core": "tsc --build mods/core",
     "build:server": "tsc --build mods/server",
     "build:client": "tsc --build mods/client",
@@ -24,6 +25,7 @@
     "build:serialization": "tsc --build mods/serialization",
     "build:sync": "tsc --build mods/sync",
     "build": "tsc --build mods/core mods/server mods/client mods/events mods/state-machine mods/dirt-registry mods/shared mods/networking mods/serialization mods/sync",
+    "test:core": "jest mods/core",
     "test:events": "jest mods/events",
     "test:server": "jest mods/server",
     "test:client": "jest mods/client",
@@ -55,6 +57,7 @@
     "@types/node": "^14.14.22",
     "@types/websocket": "^1.0.1",
     "jest": "^26.6.3",
+    "md-to-pdf": "^3.3.1",
     "ts-jest": "^26.5.0",
     "typescript": "^4.2.0-beta"
   },
