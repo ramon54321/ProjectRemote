@@ -1,5 +1,10 @@
 import { ClientActions } from './ClientActions'
 
+export interface Vec2 {
+  x: number
+  y: number
+}
+
 type ClientAction<T extends keyof ClientActions> = {
   type: T
   payload: ClientActions[T]

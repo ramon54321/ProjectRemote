@@ -1,7 +1,6 @@
 import { Events, EventEmitter } from '@events'
 import { ClientEvents, LogicCore as ILogicCore, Actions } from '@shared'
 import { NetworkState } from './NetworkState'
-import { LogicCore } from './LogicCore'
 
 export abstract class LogicCoreBase implements ILogicCore {
   protected state: NetworkState
@@ -20,5 +19,7 @@ export abstract class LogicCoreBase implements ILogicCore {
   }
   abstract tick(tickNumber: number): void
 }
+
+import { LogicCore } from './LogicCore'
 
 export { LogicCore, NetworkState }

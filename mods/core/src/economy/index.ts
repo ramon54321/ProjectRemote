@@ -1,5 +1,8 @@
-import { NetworkState } from '../NetworkState'
+import { LogicModule } from '../LogicModule'
 
-export function tickEconomy(state: NetworkState) {
-  // const naturalResourceEntities
+export class EconomyLogic extends LogicModule {
+  protected moduleId: string = 'Economy'
+  onTick(tickNumber: number) {}
 }
+
+export class EconomyState {}

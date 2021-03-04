@@ -1,9 +1,15 @@
 import { LogicCoreBase } from '.'
-import { tickEconomy } from './economy'
+import { Debug } from './Debug'
+import { WorldLogic } from './world'
+import { EconomyLogic } from './economy'
 
 export class LogicCore extends LogicCoreBase {
+  private readonly worldLogic = new WorldLogic(this.state)
+  private readonly economyLogic = new EconomyLogic(this.state)
   tick(tickNumber: number): void {
     console.log('Tick', tickNumber)
-    tickEconomy(this.state)
+    this.worldLogic.tick(tickNumber)
+    this.economyLogic.tick(tickNumber)
+    Debug.print()
   }
 }
