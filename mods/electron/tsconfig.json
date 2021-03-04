@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "baseUrl": ".",
+    "paths": {
+      "@client": ["../client/src"],
+      "@client/*": ["../client/src/*"],
+      "@core": ["../core/src"],
+      "@core/*": ["../core/src/*"],
+    }
+  },
+  "references": [
+    { "path": "../client" },
+    { "path": "../core" },
+  ],
+  "include": ["./src/**/*.ts"],
+  "exclude": ["./src/**/*.test.ts"]
+}
