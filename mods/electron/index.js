@@ -1,7 +1,4 @@
 const { app, BrowserWindow } = require('electron')
-// const unhandled = require('electron-unhandled')
-
-// unhandled()
 
 app.on('ready', () => {
   const window = new BrowserWindow({

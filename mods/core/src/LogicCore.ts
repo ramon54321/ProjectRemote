@@ -1,4 +1,4 @@
-import { LogicCoreBase } from '.'
+import { LogicCoreBase } from './LogicCoreBase'
 import { Debug } from './Debug'
 import { WorldLogic } from './world'
 import { EconomyLogic } from './economy'

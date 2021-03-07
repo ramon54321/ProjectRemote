@@ -1,7 +1,7 @@
 {
-  "main": "./mods/core/dist/index.js",
   "scripts": {
-    "uninstall": "npm run clean && rm -rf node_modules",
+    "uninstall": "npm run clean && rm -rf node_modules && rm -rf mods/electron/node_modules && npm run clean:dist",
+    "clean:dist": "rm -rf dist",
     "clean:core": "tsc --build --clean mods/core",
     "clean:server": "tsc --build --clean mods/server",
     "clean:client": "tsc --build --clean mods/client",
@@ -15,8 +15,8 @@
     "clean:sync": "tsc --build --clean mods/sync",
     "clean": "tsc --build --clean mods/core mods/electron mods/server mods/client mods/events mods/ecs mods/state-machine mods/dirt-registry mods/shared mods/networking mods/sync && rm -rf mods/core/dist mods/electron/dist mods/server/dist mods/client/dist mods/events/dist mods/ecs/dist mods/state-machine/dist mods/dirt-registry/dist mods/shared/dist mods/networking/dist mods/serialization/dist mods/sync/dist",
     "build:readme": "md-to-pdf README.md",
+    "build:electron": "npm --prefix mods/electron run build",
     "build:core": "tsc --build mods/core",
-    "build:electron": "tsc --build mods/electron",
     "build:server": "tsc --build mods/server",
     "build:client": "tsc --build mods/client",
     "build:events": "tsc --build mods/events",
@@ -27,7 +27,7 @@
     "build:networking": "tsc --build mods/networking",
     "build:serialization": "tsc --build mods/serialization",
     "build:sync": "tsc --build mods/sync",
-    "build": "tsc --build mods/core mods/electron mods/server mods/client mods/events mods/ecs mods/state-machine mods/dirt-registry mods/shared mods/networking mods/serialization mods/sync",
+    "build": "tsc --build mods/core mods/server mods/client mods/events mods/ecs mods/state-machine mods/dirt-registry mods/shared mods/networking mods/serialization mods/sync && npm run build:electron",
     "test:core": "jest mods/core",
     "test:electron": "jest mods/electron",
     "test:server": "jest mods/server",
@@ -59,7 +59,7 @@
     "example:networking": "node ./mods/networking/dist/example",
     "example:serialization": "node ./mods/serialization/dist/example",
     "package:electron": "./pack_electron.bash",
-    "run:client": "open dist/client/remote-darwin-x64/remote.app"
+    "run:electron": "open dist/electron/remote-darwin-x64/remote.app"
   },
   "devDependencies": {
     "@types/jest": "^26.0.20",
@@ -68,7 +68,6 @@
     "@types/websocket": "^1.0.1",
     "electron": "^12.0.0",
     "electron-packager": "^15.2.0",
-    "electron-unhandled": "^3.0.2",
     "jest": "^26.6.3",
     "md-to-pdf": "^3.3.1",
     "ts-jest": "^26.5.0",
