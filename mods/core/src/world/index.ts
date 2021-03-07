@@ -1,10 +1,32 @@
-import { Vec2 } from '@shared'
+import { Vec2, shuffleArray } from '@shared'
 import { LogicModule } from '../LogicModule'
+import { NetworkState } from '../NetworkState'
+
+function spreadHeat(delta: number, state: NetworkState) {
+  for (let i = 0; i < 2; i++) {
+    const shuffledWorldTiles = shuffleArray([...state.getWorldTiles()])
+    shuffledWorldTiles.forEach(tile => {
+      const borderTiles = shuffleArray([...tile.getTilesAdjacent()]).slice(0, 4)
+      borderTiles.forEach(borderTile => {
+        const diffToBorderTile = borderTile.condition.temperature - tile.condition.temperature
+        tile.condition.addTemperature(diffToBorderTile / 16)
+        borderTile.condition.addTemperature(-diffToBorderTile / 16)
+      })
+    })
+  }
+  state.getWorldTiles().forEach(tile => state.setWorldTileCondition(tile.x, tile.y, 'temperature', tile.condition.temperature))
+}
 
 export class WorldLogic extends LogicModule {
   protected moduleId: string = 'World'
-  onTick(tickNumber: number) {
-    this.state.setWorldTileCondition(7, 1, 'temperature', 19)
+  onTick(tickNumber: number, delta: number) {
+    this.state.setWorldTileCondition(10, 10, 'heatEmissionTemperature', 24)
+    this.state.setWorldTileCondition(10, 11, 'heatEmissionTemperature', 76)
+    this.state.setWorldTileCondition(11, 10, 'heatEmissionTemperature', 24)
+    this.state.setWorldTileCondition(11, 11, 'heatEmissionTemperature', 24)
+    this.state.setWorldTileCondition(3, 3, 'isHeatSink', true)
+    this.state.setWorldTileCondition(3, 3, 'heatSinkTemperature', 6)
+    spreadHeat(delta, this.state)
   }
 }
 
@@ -29,6 +51,9 @@ export class WorldState {
   getTile(x: number, y: number): Tile | undefined {
     return this.tiles[this.width * y + x]
   }
+  getTiles(): Tile[] {
+    return this.tiles
+  }
   indexToPosition(i: number): Vec2 {
     const x = i % this.width
     const y = Math.floor(i / this.width)
@@ -40,14 +65,29 @@ export class WorldState {
 }
 
 export class TileCondition {
-  temperature: number = 24
+  temperature: number = 12
+  heatEmissionTemperature: number = 0
+  isHeatSink: boolean = false
+  heatSinkTemperature: number = 0
+  setTemperature(temperature: number) {
+    this.temperature = temperature
+    if (this.temperature < this.heatEmissionTemperature) {
+      this.temperature = this.heatEmissionTemperature
+    }
+    if (this.isHeatSink && this.temperature > this.heatSinkTemperature) {
+      this.temperature = this.heatSinkTemperature
+    }
+  }
+  addTemperature(temperature: number) {
+    this.setTemperature(this.temperature + temperature)
+  }
 }
 
-class Tile {
+export class Tile {
   readonly condition: TileCondition = new TileCondition()
   readonly #worldState: WorldState
-  private readonly x: number
-  private readonly y: number
+  readonly x: number
+  readonly y: number
   constructor(worldState: WorldState, x: number, y: number) {
     this.#worldState = worldState
     this.x = x

@@ -16,6 +16,7 @@
     "clean": "tsc --build --clean mods/core mods/electron mods/server mods/client mods/events mods/ecs mods/state-machine mods/dirt-registry mods/shared mods/networking mods/sync && rm -rf mods/core/dist mods/electron/dist mods/server/dist mods/client/dist mods/events/dist mods/ecs/dist mods/state-machine/dist mods/dirt-registry/dist mods/shared/dist mods/networking/dist mods/serialization/dist mods/sync/dist",
     "build:readme": "md-to-pdf README.md",
     "build:electron": "npm --prefix mods/electron run build",
+    "build:electron:dev": "npm --prefix mods/electron run build:dev",
     "build:core": "tsc --build mods/core",
     "build:server": "tsc --build mods/server",
     "build:client": "tsc --build mods/client",

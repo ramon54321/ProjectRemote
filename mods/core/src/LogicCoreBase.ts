@@ -17,5 +17,5 @@ export abstract class LogicCoreBase implements ILogicCore {
   close() {
     this.events.close()
   }
-  abstract tick(tickNumber: number): void
+  abstract tick(tickNumber: number, delta: number): void
 }

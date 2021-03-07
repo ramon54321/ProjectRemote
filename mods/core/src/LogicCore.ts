@@ -6,10 +6,10 @@ import { EconomyLogic } from './economy'
 export class LogicCore extends LogicCoreBase {
   private readonly worldLogic = new WorldLogic(this.state)
   private readonly economyLogic = new EconomyLogic(this.state)
-  tick(tickNumber: number): void {
+  tick(tickNumber: number, delta: number): void {
     console.log('Tick', tickNumber)
-    this.worldLogic.tick(tickNumber)
-    this.economyLogic.tick(tickNumber)
+    this.worldLogic.tick(tickNumber, delta)
+    this.economyLogic.tick(tickNumber, delta)
     Debug.print()
   }
 }

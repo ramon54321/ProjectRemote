@@ -1,10 +1,13 @@
 <script lang="ts">
-	export let name: string;
+	export let person: { name: string, age: number }
+	
+	export let callback: () => void
 </script>
 
 <main>
-	<h1>Hello {name}!</h1>
-	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps 2.</p>
+	<h1>Hello {person.name}, how is it being {person.age} years old?</h1>
+	<button on:click={callback}>Click it</button>
+	<p>This is a paragraph.</p>
 </main>
 
 <style>

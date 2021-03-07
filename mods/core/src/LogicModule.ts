@@ -7,12 +7,12 @@ export abstract class LogicModule {
   constructor(state: NetworkState) {
     this.state = state
   }
-  tick(tickNumber: number): void {
+  tick(tickNumber: number, delta: number): void {
     const startTime = Date.now()
-    this.onTick(tickNumber)
+    this.onTick(tickNumber, delta)
     const endTime = Date.now()
     const tickTime = endTime - startTime
     Debug.logModuleTickTime(this.moduleId, tickTime)
   }
-  abstract onTick(tickNumber: number): void
+  abstract onTick(tickNumber: number, delta: number): void
 }

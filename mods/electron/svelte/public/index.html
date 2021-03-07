@@ -17,9 +17,14 @@
 		var main = new app.App({
 			target: document.body,
 			props: {
-				name: 'world',
-			},
+				person: {
+					name: 'John',
+					age: 36,
+				},
+				callback: () => console.log('Jeff')
+			}
 		})
+		setTimeout(() => main.$set({callback: () => console.log('Bob')}), 2000)
 	</script>
 </body>
 </html>

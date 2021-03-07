@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "build:dev": "tsc --build --watch"
   },
   "devDependencies": {
     "@types/module-alias": "^2.0.0",

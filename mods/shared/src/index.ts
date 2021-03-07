@@ -5,14 +5,14 @@ export interface Vec2 {
   y: number
 }
 
-type ClientAction<T extends keyof ClientActions> = {
-  type: T
-  payload: ClientActions[T]
+export type ClientAction = {
+  type: keyof ClientActions
+  payload: ClientActions[keyof ClientActions]
 }
 
 export interface ClientEvents {
   'request.action': {
-    action: ClientAction<keyof ClientActions>
+    action: ClientAction
   }
   'request.bob': {
     entityId: string
@@ -35,7 +35,7 @@ export interface ServerEvents {
 export interface LogicCore {
   open(): void
   close(): void
-  tick(tickNumber: number): void
+  tick(tickNumber: number, delta: number): void
 }
 
 export type Actions<O> = {
@@ -52,4 +52,18 @@ export function replaceObject(target: object, value: object) {
       ;(target as any)[key] = newValue
     }
   }
+}
+
+export function shuffleArray<T>(arr: T[]) {
+  let currentIndex = arr.length
+  let temporaryValue
+  let randomIndex
+  while (0 !== currentIndex) {
+    randomIndex = Math.floor(Math.random() * currentIndex)
+    currentIndex -= 1
+    temporaryValue = arr[currentIndex]
+    arr[currentIndex] = arr[randomIndex]
+    arr[randomIndex] = temporaryValue
+  }
+  return arr
 }

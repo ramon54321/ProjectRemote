@@ -17,6 +17,7 @@ export class StatePlay extends State<States> {
   private playEvents!: Events<PlayEvents>
   private logicCore!: LogicCore
   private tickHandle: any
+  private tickDeltaSeconds: number = 1
   async onEnter(): Promise<ExtendedStates<States>> {
     console.log('Entering play')
     this.state = new NetworkState('WRITER')
@@ -28,7 +29,7 @@ export class StatePlay extends State<States> {
     this.playEvents = new Events<PlayEvents>()
     this.logicCore = new LogicCoreImpl(this.state, this.network)
     this.logicCore.open()
-    this.tickHandle = setInterval(() => this.onTick(), 1000)
+    this.tickHandle = setInterval(() => this.onTick(this.tickDeltaSeconds), this.tickDeltaSeconds * 1000)
     await this.playEvents.for('gameover')
     return 'Shutdown'
   }
@@ -43,8 +44,8 @@ export class StatePlay extends State<States> {
     sendSetState(this.network, connection, this.state)
   }
   private tickNumber = 0
-  private onTick() {
-    this.logicCore.tick(this.tickNumber)
+  private onTick(delta: number) {
+    this.logicCore.tick(this.tickNumber, delta)
     sendDeltaState(this.network, this.state)
     this.tickNumber++
   }
