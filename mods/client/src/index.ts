@@ -10,6 +10,7 @@ export function open(draw: (state: NetworkState) => void) {
   network.on('deltaState', payload => {
     payload.actions.forEach(action => state.applyAction(action))
     draw(state)
+    console.log('Delta - ', payload.actions)
     console.log('After Delta - State Client', state)
   })
   network.on('setState', payload => {

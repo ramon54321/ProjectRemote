@@ -5,3 +5,22 @@ html {
 canvas {
   border: 1px solid black;
 }
+
+.toolbar input {
+  margin-left: 14px;
+  margin-right: 4px;
+}
+
+.toolbar button {
+  display: block;
+  margin: 4px;
+  width: 180px;
+}
+
+.toolbar button:not(:last-child) {
+  border-bottom: none;
+}
+
+.toolbar button:first-child {
+  margin-top: 0;
+}

@@ -1,71 +1,70 @@
 import './register'
 import { open } from '@client'
 import { NetworkState } from '@core'
+import { DrawInfo, Hub } from './types'
+import { drawHeat } from './drawing/heat'
+import Toolbar from './Toolbar'
+import { EventEmitter } from 'events'
 
-const canvasWidthPx = 800
-const canvasHeightPx = 800
-const tileWidthPx = canvasWidthPx / 20
-const tileHeightPx = canvasHeightPx / 20
-
-const dom = setupDOM()
-const hub = open(draw)
+const drawInfo: DrawInfo = setupDrawInfo(800, 800)
+const hub: Hub = setupHub()
+const toolbar = new Toolbar(drawInfo.dom.toolbarDiv, hub)
 
 function draw(state: NetworkState) {
-  dom.stateDiv.innerHTML = JSON.stringify(state, null, 2)
-
-  dom.context.clearRect(0, 0, canvasWidthPx, canvasHeightPx)
-
-  const tiles = state.getWorldTiles()
-  const maxTemperature = 25 //tiles.map(tile => tile.condition.temperature).reduce((a, c) => c > a ? c : a, Number.MIN_VALUE)
-  const minTemperature = 10 //tiles.map(tile => tile.condition.temperature).reduce((a, c) => c < a ? c : a, Number.MAX_VALUE)
-  const diffTemperature = maxTemperature - minTemperature
-  tiles.forEach(tile => {
-    const coef = (1 / diffTemperature) * (tile.condition.temperature - minTemperature)
-    const color = 255 - (coef * 255)
-    drawTile(dom.context, tile.x, tile.y, `rgb(255, ${color}, ${color})`)
-  })
+  drawInfo.dom.context.clearRect(0, 0, drawInfo.canvasWidthPx, drawInfo.canvasHeightPx)
+  if (toolbar.isChecked('Heat')) drawHeat(drawInfo, state)
 }
 
-function drawTile(context: CanvasRenderingContext2D, x: number, y: number, color: string) {
-  const xp = x * tileWidthPx
-  const yp = canvasHeightPx - (y + 1) * tileHeightPx
-  context.fillStyle = color
-  context.fillRect(xp, yp, tileWidthPx, tileHeightPx)
-}
-
-function setupDOM() {
-  const body = document.body
-  const { canvas, context } = setupCanvas()
-  const button = document.createElement('button')
-  document.body.appendChild(button)
-  button.textContent = 'Build Barracks'
-  button.onclick = () =>
-    hub.sendRequest({
-      type: 'build',
-      payload: {
-        building: 'Barracks',
-      },
-    })
-  const stateDiv = document.createElement('div')
-  document.body.appendChild(stateDiv)
+function setupHub(): Hub {
+  const hubEvents = new EventEmitter()
+  let lastState: NetworkState
+  const drawWrapper = (state: NetworkState) => {
+    lastState = state
+    hubEvents.emit('render')
+    draw(state)
+  }
   return {
-    body,
-    canvas,
-    context,
-    button,
-    stateDiv,
+    ...open(drawWrapper),
+    triggerDraw: () => drawWrapper(lastState),
   }
 }
 
-function setupCanvas() {
+function setupDrawInfo(canvasWidthPx: number, canvasHeightPx: number): DrawInfo {
+  const body = document.body
+
+  const containerDiv = document.createElement('div')
+  containerDiv.style.padding = '20px'
+  containerDiv.style.display = 'flex'
+  containerDiv.style.justifyContent = 'center'
+  body.appendChild(containerDiv)
+
+  const toolbarDiv = document.createElement('div')
+  toolbarDiv.classList.add('toolbar')
+  containerDiv.appendChild(toolbarDiv)
+
   const canvas = document.createElement('canvas')
-  document.body.appendChild(canvas)
+  containerDiv.appendChild(canvas)
   canvas.width = canvasWidthPx
   canvas.height = canvasHeightPx
-  canvas.style.width = '800px'
-  canvas.style.height = '800px'
-
+  canvas.style.width = `${canvasWidthPx}px`
+  canvas.style.height = `${canvasHeightPx}px`
   const context = canvas.getContext('2d') as CanvasRenderingContext2D
 
-  return { canvas, context }
+  const infoDiv = document.createElement('div')
+  body.appendChild(infoDiv)
+
+  const stateDiv = document.createElement('div')
+  body.appendChild(stateDiv)
+
+  return {
+    canvasWidthPx: canvasWidthPx,
+    canvasHeightPx: canvasHeightPx,
+    dom: {
+      canvas,
+      context,
+      toolbarDiv,
+      infoDiv,
+      stateDiv,
+    },
+  }
 }

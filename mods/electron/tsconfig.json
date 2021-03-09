@@ -11,11 +11,14 @@
       "@client/*": ["../client/src/*"],
       "@core": ["../core/src"],
       "@core/*": ["../core/src/*"],
+      "@shared": ["../shared/src"],
+      "@shared/*": ["../shared/src/*"],
     }
   },
   "references": [
     { "path": "../client" },
     { "path": "../core" },
+    { "path": "../shared" },
   ],
   "include": [
     "./src/**/*.ts",

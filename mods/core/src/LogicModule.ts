@@ -7,6 +7,10 @@ export abstract class LogicModule {
   constructor(state: NetworkState) {
     this.state = state
   }
+  start() {
+    this.onStart()
+  }
+  abstract onStart(): void
   tick(tickNumber: number, delta: number): void {
     const startTime = Date.now()
     this.onTick(tickNumber, delta)
