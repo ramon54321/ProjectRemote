@@ -1,70 +1,57 @@
 import './register'
-import { open } from '@client'
 import { NetworkState } from '@core'
-import { DrawInfo, Hub } from './types'
+import { UICtx } from './UICtx'
+import { drawWorldSurface } from './drawing/world'
 import { drawHeat } from './drawing/heat'
-import Toolbar from './Toolbar'
-import { EventEmitter } from 'events'
+import { drawEntities } from './drawing/entities'
+import { drawHoverTile } from './drawing/hover'
+import * as Utils from './utils'
 
-const drawInfo: DrawInfo = setupDrawInfo(800, 800)
-const hub: Hub = setupHub()
-const toolbar = new Toolbar(drawInfo.dom.toolbarDiv, hub)
+const uiCtx = new UICtx(800, 800, update, draw)
+
+function update(delta: number) {
+  if (uiCtx.isActionState('Select') && uiCtx.getSelectedEntity()) {
+    uiCtx.setActionState('Entity')
+  }
+
+  if (uiCtx.getKeyDown('click')) {
+    if (uiCtx.callbacks.isDirtyClick()) {
+      const hover = Utils.getHover(uiCtx)
+      uiCtx.callbacks.popClick()!.func(uiCtx.getMousePositionTile(), hover.entity)
+    } else if (uiCtx.isActionState('Select') || uiCtx.isActionState('Entity')) {
+      const hover = Utils.getHover(uiCtx)
+      if (hover.entity) {
+        uiCtx.setSelectedEntity(hover.entity)
+        uiCtx.clearSelectedTile()
+      } else {
+        uiCtx.setSelectedTile(hover.tile)
+        uiCtx.clearSelectedEntity()
+      }
+      uiCtx.flagRedraw()
+    }
+  }
+
+  if (uiCtx.getKeyOnce(' ') && uiCtx.isActionState('Entity')) {
+    uiCtx.events.emit('promptEntity')
+  }
+
+  if (uiCtx.getKeyDown('a')) {
+    uiCtx.moveCameraX(-500, delta)
+  }
+  if (uiCtx.getKeyDown('d')) {
+    uiCtx.moveCameraX(500, delta)
+  }
+  if (uiCtx.getKeyDown('w')) {
+    uiCtx.moveCameraY(-500, delta)
+  }
+  if (uiCtx.getKeyDown('s')) {
+    uiCtx.moveCameraY(500, delta)
+  }
+}
 
 function draw(state: NetworkState) {
-  drawInfo.dom.context.clearRect(0, 0, drawInfo.canvasWidthPx, drawInfo.canvasHeightPx)
-  if (toolbar.isChecked('Heat')) drawHeat(drawInfo, state)
-}
-
-function setupHub(): Hub {
-  const hubEvents = new EventEmitter()
-  let lastState: NetworkState
-  const drawWrapper = (state: NetworkState) => {
-    lastState = state
-    hubEvents.emit('render')
-    draw(state)
-  }
-  return {
-    ...open(drawWrapper),
-    triggerDraw: () => drawWrapper(lastState),
-  }
-}
-
-function setupDrawInfo(canvasWidthPx: number, canvasHeightPx: number): DrawInfo {
-  const body = document.body
-
-  const containerDiv = document.createElement('div')
-  containerDiv.style.padding = '20px'
-  containerDiv.style.display = 'flex'
-  containerDiv.style.justifyContent = 'center'
-  body.appendChild(containerDiv)
-
-  const toolbarDiv = document.createElement('div')
-  toolbarDiv.classList.add('toolbar')
-  containerDiv.appendChild(toolbarDiv)
-
-  const canvas = document.createElement('canvas')
-  containerDiv.appendChild(canvas)
-  canvas.width = canvasWidthPx
-  canvas.height = canvasHeightPx
-  canvas.style.width = `${canvasWidthPx}px`
-  canvas.style.height = `${canvasHeightPx}px`
-  const context = canvas.getContext('2d') as CanvasRenderingContext2D
-
-  const infoDiv = document.createElement('div')
-  body.appendChild(infoDiv)
-
-  const stateDiv = document.createElement('div')
-  body.appendChild(stateDiv)
-
-  return {
-    canvasWidthPx: canvasWidthPx,
-    canvasHeightPx: canvasHeightPx,
-    dom: {
-      canvas,
-      context,
-      toolbarDiv,
-      infoDiv,
-      stateDiv,
-    },
-  }
+  if (uiCtx.toolbar.isChecked('WorldSurface')) drawWorldSurface(uiCtx, state)
+  drawHoverTile(uiCtx)
+  if (uiCtx.toolbar.isChecked('Heat')) drawHeat(uiCtx, state)
+  if (uiCtx.toolbar.isChecked('Entities')) drawEntities(uiCtx, state)
 }

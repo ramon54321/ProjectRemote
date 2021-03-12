@@ -13,12 +13,15 @@
       "@core/*": ["../core/src/*"],
       "@shared": ["../shared/src"],
       "@shared/*": ["../shared/src/*"],
+      "@events": ["../events/src"],
+      "@events/*": ["../events/src/*"],
     }
   },
   "references": [
     { "path": "../client" },
     { "path": "../core" },
     { "path": "../shared" },
+    { "path": "../events" },
   ],
   "include": [
     "./src/**/*.ts",

@@ -5,7 +5,7 @@ const HEAT_TRANSFER_RATE = 2 // 0.1 -> 10
 const HEAT_AMBIENT = 295
 
 function addHeat(delta: number, state: NetworkState) {
-  // state.getWorldHeatGridTiles()[820].attributes.addHeat(2 * delta)
+  state.getWorldHeatGridTiles()[210].attributes.addHeat(2 * delta)
 }
 
 function spreadHeat(delta: number, state: NetworkState) {

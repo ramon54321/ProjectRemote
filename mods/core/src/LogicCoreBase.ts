@@ -8,7 +8,7 @@ export abstract class LogicCoreBase implements ILogicCore {
   constructor(networkState: NetworkState, emitter: EventEmitter) {
     this.state = networkState
     this.events = new Events(emitter, {
-      'request.action': action => console.log('Action', action.action.payload.building),
+      'request.action': action => console.log('Action', action.action),
     })
   }
   open() {

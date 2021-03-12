@@ -5,14 +5,21 @@ export interface Vec2 {
   y: number
 }
 
-export type ClientAction = {
-  type: keyof ClientActions
-  payload: ClientActions[keyof ClientActions]
+export interface NetworkEntity {
+  id: number
+  components: any
+}
+
+export type ClientActionKeys = keyof ClientActions
+
+export type ClientAction<T extends ClientActionKeys> = {
+  type: T
+  payload: ClientActions[T]
 }
 
 export interface ClientEvents {
   'request.action': {
-    action: ClientAction
+    action: ClientAction<ClientActionKeys>
   }
   'request.bob': {
     entityId: string

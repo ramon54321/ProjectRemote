@@ -8,6 +8,8 @@
     "paths": {
       "@shared": ["../shared/src"],
       "@shared/*": ["../shared/src/*"],
+      "@ecs": ["../ecs/src"],
+      "@ecs/*": ["../ecs/src/*"],
       "@events": ["../events/src"],
       "@events/*": ["../events/src/*"],
       "@serialization": ["../serialization/src"],
@@ -16,7 +18,7 @@
       "@sync/*": ["../sync/src/*"]
     }
   },
-  "references": [{ "path": "../shared" }, { "path": "../events" }, { "path": "../serialization" }, { "path": "../sync" }],
+  "references": [{ "path": "../shared" }, { "path": "../ecs" }, { "path": "../events" }, { "path": "../serialization" }, { "path": "../sync" }],
   "include": ["./src/**/*.ts"],
   "exclude": ["./src/**/*.test.ts"]
 }

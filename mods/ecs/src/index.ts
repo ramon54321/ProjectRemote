@@ -1,4 +1,5 @@
 export class ECS<CT, T extends keyof CT> {
+  private readonly entites: Set<Entity<CT, T>> = new Set()
   private readonly entityComponentMap: Record<T, Set<Entity<CT, T>>>
   private readonly systems: System<CT, T>[] = []
   constructor(componentTags: readonly T[]) {
@@ -7,11 +8,16 @@ export class ECS<CT, T extends keyof CT> {
       this.entityComponentMap[componentTag] = new Set<Entity<CT, T>>()
     })
   }
+  start() {
+    this.entites.forEach(entity => entity.getComponents().forEach(component => component.start()))
+  }
   tick() {
     this.systems.forEach(system => system.tick())
   }
   createEntity(): Entity<CT, T> {
-    return new Entity(this as any)
+    const entity = new Entity<CT, T>(this)
+    this.entites.add(entity)
+    return entity
   }
   addSystem<S extends System<CT, T>>(systemClass: new (ecs: ECS<CT, T>) => S): ECS<CT, T> {
     this.systems.push(new systemClass(this))
@@ -22,6 +28,9 @@ export class ECS<CT, T extends keyof CT> {
     const intersectionEntities = entitySets.reduce(intersection)
     return intersectionEntities
   }
+  getEntities(): Set<Entity<CT, T>> {
+    return this.entites
+  }
   __addEntityToComponentSet(entity: Entity<CT, T>, componentTag: T) {
     this.entityComponentMap[componentTag].add(entity)
   }
@@ -29,11 +38,13 @@ export class ECS<CT, T extends keyof CT> {
 
 export class Entity<CT, T extends keyof CT> {
   private readonly ecs: ECS<CT, T>
+  private readonly components: Set<Component<CT, T>> = new Set()
   private readonly componentMap = new Map<T, Component<CT, T>>()
   constructor(ecs: ECS<CT, T>) {
     this.ecs = ecs
   }
   addComponent(component: Component<CT, T>): Entity<CT, T> {
+    this.components.add(component)
     this.ecs.__addEntityToComponentSet(this, component.getTag())
     this.componentMap.set(component.getTag(), component)
     return this
@@ -41,9 +52,15 @@ export class Entity<CT, T extends keyof CT> {
   getComponent<K extends T>(componentTag: K): CT[K] {
     return (this.componentMap.get(componentTag) as unknown) as CT[K]
   }
+  getComponents(): Set<Component<CT, T>> {
+    return this.components
+  }
 }
 
 export abstract class Component<CT, T extends keyof CT> {
+  start() {
+    
+  }
   getTag(): T {
     return this.constructor.prototype.tag
   }
