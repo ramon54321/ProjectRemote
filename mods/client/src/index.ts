@@ -1,6 +1,6 @@
 import 'module-alias/register'
 import * as _ from 'lodash'
-import { ServerEvents, ClientEvents, replaceObject, ClientAction, ClientActionKeys } from '@shared'
+import { ServerEvents, ClientEvents, replaceObject, ClientAction } from '@shared'
 import { NetworkState } from '@core'
 import { NetClient } from '@networking'
 
@@ -18,7 +18,7 @@ export function open(draw: (state: NetworkState) => void) {
     draw(state)
     console.log('After Set - State Client', state)
   })
-  const sendRequest = <T extends ClientActionKeys>(clientAction: ClientAction<T>) => {
+  const sendRequest = (clientAction: ClientAction) => {
     network.emitOnServer({
       tag: 'request.action',
       payload: {

@@ -1,25 +1,33 @@
-import { LogicCoreBase } from './LogicCoreBase'
 import { Debug } from './Debug'
+import { ClientAction } from '@shared'
+import { LogicCoreBase } from './LogicCoreBase'
+import { LogicModule } from './LogicModule'
 import { WorldLogic } from './world'
 import { EconomyLogic } from './economy'
 import { EntitiesLogic } from './entities'
 
 export class LogicCore extends LogicCoreBase {
-  private readonly worldLogic = new WorldLogic(this.state)
-  private readonly economyLogic = new EconomyLogic(this.state)
-  private readonly entitiesLogic = new EntitiesLogic(this.state)
+  private readonly logicModules: LogicModule[] = [new WorldLogic(this.state), new EconomyLogic(this.state), new EntitiesLogic(this.state)]
   start() {
     console.log('Start')
-    this.worldLogic.start()
-    this.economyLogic.start()
-    this.entitiesLogic.start()
+    this.logicModules.forEach(module => module.start())
   }
   tick(tickNumber: number, delta: number): void {
     if (tickNumber === 0) this.start()
     console.log('Tick', tickNumber)
-    this.worldLogic.tick(tickNumber, delta)
-    this.economyLogic.tick(tickNumber, delta)
-    this.entitiesLogic.tick(tickNumber, delta)
+    this.tickActionRequests()
+    this.logicModules.forEach(module => module.tick(tickNumber, delta))
     Debug.print()
+  }
+  private readonly clientActionRequests: ClientAction[] = []
+  onRequestAction(clientAction: ClientAction) {
+    this.clientActionRequests.push(clientAction)
+  }
+  tickActionRequests() {
+    let actionRequest = this.clientActionRequests.shift()
+    while (actionRequest !== undefined) {
+      this.logicModules.forEach(module => module.onRequestAction(actionRequest!))
+      actionRequest = this.clientActionRequests.shift()
+    }
   }
 }

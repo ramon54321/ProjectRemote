@@ -1,5 +1,6 @@
 import { NetworkState } from './NetworkState'
 import { Debug } from './Debug'
+import { ClientAction } from '@shared'
 
 export abstract class LogicModule {
   protected abstract readonly moduleId: string
@@ -19,4 +20,5 @@ export abstract class LogicModule {
     Debug.logModuleTickTime(this.moduleId, tickTime)
   }
   abstract onTick(tickNumber: number, delta: number): void
+  abstract onRequestAction(clientAction: ClientAction): void
 }

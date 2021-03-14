@@ -10,16 +10,19 @@ export interface NetworkEntity {
   components: any
 }
 
-export type ClientActionKeys = keyof ClientActions
-
-export type ClientAction<T extends ClientActionKeys> = {
-  type: T
-  payload: ClientActions[T]
+export type ClientAction = ClientAction_Build | ClientAction_Move
+type ClientAction_Build = {
+  type: 'Build'
+  payload: ClientActions['Build']
+}
+type ClientAction_Move= {
+  type: 'Move'
+  payload: ClientActions['Move']
 }
 
 export interface ClientEvents {
   'request.action': {
-    action: ClientAction<ClientActionKeys>
+    action: ClientAction
   }
   'request.bob': {
     entityId: string

@@ -45,7 +45,7 @@ export class UICtx {
   }
   private networkState: NetworkState
   private needsRedraw: boolean = true
-  readonly sendRequest: <T extends 'build' | 'move'>(clientAction: ClientAction<T>) => void
+  readonly sendRequest: (clientAction: ClientAction) => void
   readonly callbacks: Callbacks
   readonly toolbar: Toolbar
   readonly entityManager: EntityManager

@@ -1,6 +1,7 @@
 import { LogicModule } from '../LogicModule'
 import { startHeat, tickHeat, HeatAttributes } from './heat'
 import { Grid } from '../utils/Grid'
+import { ClientAction } from '@shared'
 
 export class WorldLogic extends LogicModule {
   protected moduleId: string = 'World'
@@ -9,6 +10,9 @@ export class WorldLogic extends LogicModule {
   }
   onTick(tickNumber: number, delta: number) {
     tickHeat(delta, this.state)
+  }
+  onRequestAction(clientAction: ClientAction) {
+    
   }
 }
 

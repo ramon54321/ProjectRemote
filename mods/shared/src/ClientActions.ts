@@ -1,10 +1,10 @@
 import { Vec2 } from "."
 
 export interface ClientActions {
-  build: {
+  Build: {
     building: 'Barracks' | 'House'
   }
-  move: {
+  Move: {
     entityId: number
     target: Vec2
   }

@@ -1,10 +1,15 @@
-import { NetworkEntity } from '@shared'
+import { ClientAction, NetworkEntity, Vec2 } from '@shared'
 import { LogicModule } from '../LogicModule'
-import { Vec2 } from '@shared'
-import { ECS, Entity, System, TaggedComponent } from '@ecs'
+import { Component, ECS, Entity, System, TaggedComponent } from '@ecs'
+
+type NetifyComponent<CT, T extends keyof CT> = Component<CT, T> & INetify
 
 interface INetify {
   getNetworkState(): any
+}
+
+function isINetify<CT, T extends keyof CT>(component: Component<CT, T>): component is NetifyComponent<CT, T> {
+  return (component as NetifyComponent<CT, T>).getNetworkState !== undefined
 }
 
 export class EntitiesLogic extends LogicModule {
@@ -19,23 +24,25 @@ export class EntitiesLogic extends LogicModule {
     this.ecs.tick()
     this.ecs.getEntities().forEach(entity => this.state.setEntity(this.mapEntityToNetworkEntity(entity)))
   }
+  onRequestAction(clientAction: ClientAction) {
+    if (clientAction.type === 'Move') {
+      console.log('Move received for', clientAction.payload.entityId)
+    }
+  }
   private mapEntityToNetworkEntity(entity: Entity<ComponentTags, Components>): NetworkEntity {
     const id = entity.getComponent('Identity').getId()
-    const networkStateComponents = {} as any
-    const componentsWithNetworkState = Array.from(entity.getComponents())
-      .map(component => {
-        if ((component as any).getNetworkState) {
-          return { tag: component.getTag(), networkState: (component as any).getNetworkState() }
-        }
-      })
-      .filter(component => component !== undefined) as any[]
-    componentsWithNetworkState.forEach(component => (networkStateComponents[component.tag] = component.networkState))
     return {
       id: id,
-      components: networkStateComponents,
+      components: Array.from(entity.getComponents())
+        .filter(isINetify)
+        .reduce((networkStateComponents, component) => { // TODO: Create function for this
+          networkStateComponents[component.getTag()] = component.getNetworkState()
+          return networkStateComponents
+        }, {} as any),
     }
   }
 }
+
 const components = ['Identity', 'Transform'] as const
 type ComponentTags = {
   Identity: Identity
@@ -99,7 +106,7 @@ class Movement extends System<ComponentTags, Components> {
     }
     const currentPosition = entity.getComponent('Transform').getPosition()
     const newPosition = { x: currentPosition.x + movement.x, y: currentPosition.y + movement.y }
-    const newPositionConstrained = { 
+    const newPositionConstrained = {
       x: clamp(newPosition.x, 0, 20),
       y: clamp(newPosition.y, 0, 20),
     }

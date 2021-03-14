@@ -1,5 +1,5 @@
 import { Events, EventEmitter } from '@events'
-import { ClientEvents, LogicCore as ILogicCore, Actions } from '@shared'
+import { ClientEvents, LogicCore as ILogicCore, Actions, ClientAction } from '@shared'
 import { NetworkState } from './NetworkState'
 
 export abstract class LogicCoreBase implements ILogicCore {
@@ -8,8 +8,11 @@ export abstract class LogicCoreBase implements ILogicCore {
   constructor(networkState: NetworkState, emitter: EventEmitter) {
     this.state = networkState
     this.events = new Events(emitter, {
-      'request.action': action => console.log('Action', action.action),
+      'request.action': body => this.onRequestAction(body.action),
     })
+  }
+  protected onRequestAction(clientAction: ClientAction) {
+    console.log('Action', clientAction)
   }
   open() {
     this.events.open()

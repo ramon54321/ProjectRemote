@@ -21,7 +21,7 @@ export class Toolbar {
         onClick: () =>
           this.uiCtx.callbacks.pushClick('TileSelect', (tilePosition: Vec2) =>
             this.uiCtx.sendRequest({
-              type: 'move',
+              type: 'Move',
               payload: {
                 entityId: this.uiCtx.getSelectedEntity()?.id!,
                 target: tilePosition,
@@ -35,7 +35,7 @@ export class Toolbar {
         text: 'Barracks',
         onClick: () =>
           this.uiCtx.sendRequest({
-            type: 'build',
+            type: 'Build',
             payload: {
               building: 'Barracks',
             },
@@ -45,7 +45,7 @@ export class Toolbar {
         text: 'House',
         onClick: () =>
           this.uiCtx.sendRequest({
-            type: 'build',
+            type: 'Build',
             payload: {
               building: 'House',
             },
