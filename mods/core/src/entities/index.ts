@@ -15,9 +15,11 @@ function isINetify<CT, T extends keyof CT>(component: Component<CT, T>): compone
 export class EntitiesLogic extends LogicModule {
   protected moduleId: string = 'Entities'
   private ecs!: ECS<ComponentTags, Components>
+  private entitiesState!: EntitiesState
   onStart() {
     this.ecs = new ECS<ComponentTags, Components>(components).addSystem(Debug).addSystem(Movement)
-    this.ecs.createEntity().addComponent(new Identity()).addComponent(new Transform())
+    this.entitiesState = new EntitiesState(this.ecs)
+    this.entitiesState.spawnEntity().addComponent(new Transform()).addComponent(new Move())
     this.ecs.start()
   }
   onTick(tickNumber: number, delta: number) {
@@ -26,7 +28,8 @@ export class EntitiesLogic extends LogicModule {
   }
   onRequestAction(clientAction: ClientAction) {
     if (clientAction.type === 'Move') {
-      console.log('Move received for', clientAction.payload.entityId)
+      const entity = this.entitiesState.getEntityById(clientAction.payload.entityId)
+      entity?.getComponent('Move').moveTo(clientAction.payload.target)
     }
   }
   private mapEntityToNetworkEntity(entity: Entity<ComponentTags, Components>): NetworkEntity {
@@ -35,7 +38,8 @@ export class EntitiesLogic extends LogicModule {
       id: id,
       components: Array.from(entity.getComponents())
         .filter(isINetify)
-        .reduce((networkStateComponents, component) => { // TODO: Create function for this
+        .reduce((networkStateComponents, component) => {
+          // TODO: Create function for this
           networkStateComponents[component.getTag()] = component.getNetworkState()
           return networkStateComponents
         }, {} as any),
@@ -43,10 +47,28 @@ export class EntitiesLogic extends LogicModule {
   }
 }
 
-const components = ['Identity', 'Transform'] as const
+export class EntitiesState {
+  private readonly ecs: ECS<ComponentTags, Components>
+  private readonly entitiesById: Map<number, Entity<ComponentTags, Components>> = new Map()
+  constructor(ecs: ECS<ComponentTags, Components>) {
+    this.ecs = ecs
+  }
+  getEntityById(id: number): Entity<ComponentTags, Components> | undefined {
+    return this.entitiesById.get(id)
+  }
+  spawnEntity(): Entity<ComponentTags, Components> {
+    const entity = this.ecs.createEntity().addComponent(new Identity())
+    const id = entity.getComponent('Identity').getId()
+    this.entitiesById.set(id, entity)
+    return entity
+  }
+}
+
+const components = ['Identity', 'Transform', 'Move'] as const
 type ComponentTags = {
   Identity: Identity
   Transform: Transform
+  Move: Move
 }
 
 type Components = typeof components[number]
@@ -85,12 +107,23 @@ class Transform extends TaggedComponent<ComponentTags, Components>('Transform') 
     }
   }
 }
+class Move extends TaggedComponent<ComponentTags, Components>('Move') implements INetify {
+  move(movement: Vec2) {
+    const currentPosition = this.entity.getComponent('Transform').getPosition()
+    const newPosition = { x: currentPosition.x + movement.x, y: currentPosition.y + movement.y }
+    this.entity.getComponent('Transform').setPosition(newPosition)
+  }
+  moveTo(target: Vec2) {
+    this.entity.getComponent('Transform').setPosition(target)
+  }
+  getNetworkState() {
+    return {}
+  }
+}
 
 class Debug extends System<ComponentTags, Components> {
   protected readonly dependentComponentTags = ['Identity'] as const
-  onTick(entity: Entity<ComponentTags, Components>): void {
-    // console.log(entity.getComponent('Identity').getId())
-  }
+  onTick(entity: Entity<ComponentTags, Components>): void {}
 }
 
 function clamp(x: number, a: number, b: number): number {
@@ -99,17 +132,5 @@ function clamp(x: number, a: number, b: number): number {
 
 class Movement extends System<ComponentTags, Components> {
   protected readonly dependentComponentTags = ['Transform'] as const
-  onTick(entity: Entity<ComponentTags, Components>): void {
-    const movement = {
-      x: Math.floor(-4 + Math.random() * 8),
-      y: Math.floor(-4 + Math.random() * 8),
-    }
-    const currentPosition = entity.getComponent('Transform').getPosition()
-    const newPosition = { x: currentPosition.x + movement.x, y: currentPosition.y + movement.y }
-    const newPositionConstrained = {
-      x: clamp(newPosition.x, 0, 20),
-      y: clamp(newPosition.y, 0, 20),
-    }
-    entity.getComponent('Transform').setPosition(newPositionConstrained)
-  }
+  onTick(entity: Entity<ComponentTags, Components>): void {}
 }

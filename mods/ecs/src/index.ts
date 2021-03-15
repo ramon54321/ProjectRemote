@@ -44,6 +44,7 @@ export class Entity<CT, T extends keyof CT> {
     this.ecs = ecs
   }
   addComponent(component: Component<CT, T>): Entity<CT, T> {
+    component._setEntity(this)
     this.components.add(component)
     this.ecs.__addEntityToComponentSet(this, component.getTag())
     this.componentMap.set(component.getTag(), component)
@@ -58,6 +59,10 @@ export class Entity<CT, T extends keyof CT> {
 }
 
 export abstract class Component<CT, T extends keyof CT> {
+  protected entity!: Entity<CT, T>
+  _setEntity(entity: Entity<CT, T>) {
+    this.entity = entity
+  }
   start() {
     
   }

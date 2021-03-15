@@ -1,14 +1,14 @@
 import { UICtx } from './UICtx'
-import { Callbacks } from './Callbacks'
 import { Vec2 } from '@shared'
 
 type ToolbarTag = 'Main' | 'Build' | 'Entity'
 type CheckboxTag = 'WorldSurface' | 'Heat' | 'Entities'
+type ToolbarAction = { text: string, onClick: () => void, condition?: () => boolean}
 
 export class Toolbar {
   private readonly uiCtx: UICtx
   private currentToolbarTag!: ToolbarTag
-  private readonly toolbarMap: Record<ToolbarTag, { text: string; onClick: () => void }[]> = {
+  private readonly toolbarMap: Record<ToolbarTag, ToolbarAction[]> = {
     Main: [
       {
         text: 'Build',
@@ -28,6 +28,9 @@ export class Toolbar {
               },
             }),
           ),
+        condition: () => {
+          return this.uiCtx.getSelectedEntity()?.components['Move']
+        }
       },
     ],
     Build: [
@@ -123,9 +126,9 @@ export class Toolbar {
     this.currentToolbarTag = tag
     this.setToolbarActions(this.toolbarMap[tag])
   }
-  private setToolbarActions(actions: { text: string; onClick: () => void }[]) {
+  private setToolbarActions(actions: ToolbarAction[]) {
     clearElement(this.buttonsDiv)
-    const buttons = actions.map(action => createButton(action.text, action.onClick))
+    const buttons = actions.filter(action => !action.condition || action.condition()).map(action => createButton(action.text, action.onClick))
     buttons.forEach(button => this.buttonsDiv.appendChild(button))
   }
 }
