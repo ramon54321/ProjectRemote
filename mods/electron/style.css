@@ -3,24 +3,25 @@ html {
 }
 
 canvas {
+  display: block;
   border: 1px solid black;
 }
 
-.toolbar input {
+#toolbar input {
   margin-left: 14px;
   margin-right: 4px;
 }
 
-.toolbar button {
+#toolbar button {
   display: block;
   margin: 4px;
   width: 180px;
 }
 
-.toolbar button:not(:last-child) {
+#toolbar button:not(:last-child) {
   border-bottom: none;
 }
 
-.toolbar button:first-child {
+#toolbar button:first-child {
   margin-top: 0;
 }

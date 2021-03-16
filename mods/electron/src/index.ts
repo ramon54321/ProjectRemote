@@ -7,9 +7,14 @@ import { drawEntities } from './drawing/entities'
 import { drawHoverTile } from './drawing/hover'
 import * as Utils from './utils'
 
-const uiCtx = new UICtx(800, 800, update, draw)
+const uiCtx = new UICtx(start, update, draw)
+
+function start() {
+  uiCtx.setIsDebugMode(false)
+}
 
 function update(delta: number) {
+  handleDebugMode(uiCtx)
   handleSetActionStateToEntity(uiCtx)
   handleClick(uiCtx)
   handleSpacebar(uiCtx)
@@ -17,10 +22,17 @@ function update(delta: number) {
 }
 
 function draw(state: NetworkState) {
-  if (uiCtx.toolbar.isChecked('WorldSurface')) drawWorldSurface(uiCtx, state)
+  if (!uiCtx.getIsDebugMode() || uiCtx.toolbar.isChecked('WorldSurface')) drawWorldSurface(uiCtx, state)
   drawHoverTile(uiCtx)
-  if (uiCtx.toolbar.isChecked('Heat')) drawHeat(uiCtx, state)
-  if (uiCtx.toolbar.isChecked('Entities')) drawEntities(uiCtx, state)
+  if (uiCtx.getIsDebugMode() && uiCtx.toolbar.isChecked('Heat')) drawHeat(uiCtx, state)
+  if (!uiCtx.getIsDebugMode() || uiCtx.toolbar.isChecked('Entities')) drawEntities(uiCtx, state)
+}
+
+function handleDebugMode(uiCtx: UICtx) {
+  if (uiCtx.getKeyOnce('`')) {
+    uiCtx.toggleIsDebugMode()
+    uiCtx.flagRedraw()
+  }
 }
 
 function handleSetActionStateToEntity(uiCtx: UICtx) {

@@ -4,15 +4,6 @@ import { drawText, drawTile } from '.'
 
 export function drawHeat(uiCtx: UICtx, state: NetworkState) {
   const heatGridTiles = state.getWorldHeatGridTiles()
-
-  const heatTileCount = heatGridTiles.length
-  const totalHeat = heatGridTiles.map(tile => tile.attributes.getHeat()).reduce((a, b) => a + b)
-  const maxHeat = heatGridTiles.map(tile => tile.attributes.getHeat()).reduce((a, c) => (c > a ? c : a), Number.MIN_VALUE)
-  const minHeat = heatGridTiles.map(tile => tile.attributes.getHeat()).reduce((a, c) => (c < a ? c : a), Number.MAX_VALUE)
-
-  uiCtx.dom.infoDiv.innerHTML = JSON.stringify({ heatTileCount, totalHeat, maxHeat, minHeat }, null, 2)
-  uiCtx.dom.stateDiv.innerHTML = JSON.stringify(state, null, 2)
-
   const heatMaxDraw = 305
   const heatMinDraw = 294
   const heatDiff = heatMaxDraw - heatMinDraw

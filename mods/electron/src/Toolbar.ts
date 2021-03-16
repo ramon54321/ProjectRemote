@@ -67,8 +67,9 @@ export class Toolbar {
     this.uiCtx = uiCtx
     this.buttonsDiv = document.createElement('div')
     this.settingsDiv = document.createElement('div')
-    this.uiCtx.dom.toolbarDiv.appendChild(this.buttonsDiv)
-    this.uiCtx.dom.toolbarDiv.appendChild(this.settingsDiv)
+    this.registerAsDebugElement(this.settingsDiv)
+    this.uiCtx.dom.toolbar.appendChild(this.buttonsDiv)
+    this.uiCtx.dom.toolbar.appendChild(this.settingsDiv)
     this.initInfoDiv()
     this.initPromptDiv()
     this.checkboxMap = {
@@ -86,7 +87,8 @@ export class Toolbar {
   }
   private initInfoDiv() {
     const infoDiv = document.createElement('div')
-    this.uiCtx.dom.toolbarDiv.appendChild(infoDiv)
+    this.registerAsDebugElement(infoDiv)
+    this.uiCtx.dom.toolbar.appendChild(infoDiv)
     const mousePositionPxDiv = document.createElement('div')
     const mousePositionTileDiv = document.createElement('div')
     const selectedDiv = document.createElement('div')
@@ -112,15 +114,26 @@ export class Toolbar {
     })
   }
   private createCheckbox(text: string, checked?: boolean): HTMLInputElement {
+    const checkboxContainer = document.createElement('div')
     const checkbox = document.createElement('input') as HTMLInputElement
     checkbox.type = 'checkbox'
     if (checked) checkbox.checked = true
     checkbox.onclick = () => this.uiCtx.flagRedraw()
     const textElement = document.createElement('span')
     textElement.innerText = text
-    this.settingsDiv.appendChild(checkbox)
-    this.settingsDiv.appendChild(textElement)
+    checkboxContainer.appendChild(checkbox)
+    checkboxContainer.appendChild(textElement)
+    this.settingsDiv.appendChild(checkboxContainer)
     return checkbox
+  }
+  private registerAsDebugElement(element: HTMLElement) {
+    this.uiCtx.events.on('debugToggle', isDebugMode => {
+      if (isDebugMode) {
+        element.style.display = 'block'
+      } else {
+        element.style.display = 'none'
+      }
+    })
   }
   private setToolbar(tag: ToolbarTag) {
     this.currentToolbarTag = tag

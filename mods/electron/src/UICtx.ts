@@ -14,14 +14,16 @@ interface UIEvents {
   mousePositionPxUpdate: Vec2
   mousePositionTileUpdate: Vec2
   promptEntity: void
+  debugToggle: boolean
 }
 
 type ActionState = 'Select' | 'Entity'
 
 export class UICtx {
   private isInitDone = false
-  readonly canvasWidthPx: number
-  readonly canvasHeightPx: number
+  private isDebugMode = false
+  canvasWidthPx!: number
+  canvasHeightPx!: number
   readonly tilePx: number
   private readonly cameraPositionPx: Vec2
   private readonly keyDown: Record<string, boolean>
@@ -29,9 +31,7 @@ export class UICtx {
   readonly dom: {
     readonly canvas: HTMLCanvasElement
     readonly context: CanvasRenderingContext2D
-    readonly toolbarDiv: HTMLDivElement
-    readonly infoDiv: HTMLDivElement
-    readonly stateDiv: HTMLDivElement
+    readonly toolbar: HTMLDivElement
   }
   readonly events: StrictEventEmitter<EventEmitter, UIEvents>
   private readonly triggerDraw: () => void
@@ -49,6 +49,17 @@ export class UICtx {
   readonly callbacks: Callbacks
   readonly toolbar: Toolbar
   readonly entityManager: EntityManager
+
+  getIsDebugMode(): boolean {
+    return this.isDebugMode
+  }
+  setIsDebugMode(value: boolean) {
+    this.isDebugMode = value
+    this.events.emit('debugToggle', this.isDebugMode)
+  }
+  toggleIsDebugMode() {
+    this.setIsDebugMode(!this.isDebugMode)
+  }
 
   isActionState(actionState: ActionState): boolean {
     return this.playState.actionState === actionState
@@ -117,43 +128,44 @@ export class UICtx {
     this.needsRedraw = true
   }
 
-  constructor(canvasWidthPx: number, canvasHeightPx: number, update: (delta: number) => void, draw: (networkState: NetworkState) => void) {
-    this.canvasWidthPx = canvasWidthPx
-    this.canvasHeightPx = canvasHeightPx
-
-    const body = document.body
-
-    const containerDiv = document.createElement('div')
-    containerDiv.style.padding = '20px'
-    containerDiv.style.display = 'flex'
-    containerDiv.style.justifyContent = 'center'
-    body.appendChild(containerDiv)
-
-    const toolbarDiv = document.createElement('div')
-    toolbarDiv.classList.add('toolbar')
-    containerDiv.appendChild(toolbarDiv)
-
-    const canvas = document.createElement('canvas')
-    containerDiv.appendChild(canvas)
-    canvas.width = canvasWidthPx * 2
-    canvas.height = canvasHeightPx * 2
-    canvas.style.width = `${canvasWidthPx}px`
-    canvas.style.height = `${canvasHeightPx}px`
+  private setCanvasDimensions(canvas: HTMLCanvasElement) {
+    console.log('Setting canvas size')
+    this.canvasWidthPx = window.innerWidth
+    this.canvasHeightPx = window.innerHeight
+    canvas.width = this.canvasWidthPx * 2
+    canvas.height = this.canvasHeightPx * 2
+    canvas.style.width = `${this.canvasWidthPx}px`
+    canvas.style.height = `${this.canvasHeightPx}px`
     const context = canvas.getContext('2d') as CanvasRenderingContext2D
     context.scale(2, 2)
+  }
 
-    const infoDiv = document.createElement('div')
-    body.appendChild(infoDiv)
+  constructor(start: () => void, update: (delta: number) => void, draw: (networkState: NetworkState) => void) {
+    const body = document.body
+    const canvas = document.createElement('canvas')
+    canvas.id = 'canvas'
+    this.setCanvasDimensions(canvas)
+    window.addEventListener('resize', () => this.setCanvasDimensions(canvas))
+    
+    body.appendChild(canvas)
 
-    const stateDiv = document.createElement('div')
-    body.appendChild(stateDiv)
+    const leftTopContainer = document.createElement('div')
+    leftTopContainer.id = 'leftTopContainer'
+    leftTopContainer.style.backgroundColor = '#AA2222'
+    leftTopContainer.style.position = 'fixed'
+    leftTopContainer.style.left = '0'
+    leftTopContainer.style.top = '0'
+    body.appendChild(leftTopContainer)
+    const context = canvas.getContext('2d') as CanvasRenderingContext2D
 
+    const toolbar = document.createElement('div')
+    toolbar.id = 'toolbar'
+    leftTopContainer.appendChild(toolbar)
+    
     this.dom = {
       canvas,
       context,
-      toolbarDiv,
-      infoDiv,
-      stateDiv,
+      toolbar,
     }
 
     this.keyDown = {}
@@ -192,7 +204,7 @@ export class UICtx {
       y: 0,
     }
 
-    this.tilePx = canvasWidthPx / 20
+    this.tilePx = 40
 
     this.events = new EventEmitter()
 
@@ -206,7 +218,7 @@ export class UICtx {
 
     const updateMouseTilePosition = () => {
       this.mousePositionTile.x = Math.floor((this.mousePositionPx.x + this.cameraPositionPx.x) / this.tilePx)
-      this.mousePositionTile.y = Math.floor((canvasHeightPx - (this.mousePositionPx.y + this.cameraPositionPx.y)) / this.tilePx)
+      this.mousePositionTile.y = Math.floor((this.canvasHeightPx - (this.mousePositionPx.y + this.cameraPositionPx.y)) / this.tilePx)
       this.events.emit('mousePositionTileUpdate', this.mousePositionTile)
     }
 
@@ -226,9 +238,15 @@ export class UICtx {
     this.toolbar = new Toolbar(this)
     this.entityManager = new EntityManager(this)
 
+    let hasRunOnce = false
     const updateDelta = 1 / 60
     setInterval(() => {
       if (!this.isInitDone) return
+      if (!hasRunOnce) {
+        start()
+        hasRunOnce = true
+        return
+      }
 
       if (this.mousePositionTile.x !== this.mousePositionTileLast.x || this.mousePositionTile.y !== this.mousePositionTileLast.y) {
         this.flagRedraw()
