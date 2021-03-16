@@ -16,6 +16,7 @@ function start() {
 function update(delta: number) {
   handleDebugMode(uiCtx)
   handleSetActionStateToEntity(uiCtx)
+  handleToolbarHotkeys(uiCtx)
   handleClick(uiCtx)
   handleSpacebar(uiCtx)
   handleCamera(delta, uiCtx)
@@ -39,6 +40,15 @@ function handleSetActionStateToEntity(uiCtx: UICtx) {
   if (uiCtx.isActionState('Select') && uiCtx.getSelectedEntity()) {
     uiCtx.setActionState('Entity')
   }
+}
+
+function handleToolbarHotkeys(uiCtx: UICtx) {
+  const activeActions = uiCtx.toolbar.getActiveActions()
+  activeActions.forEach((action) => {
+    if ((!action.condition || action.condition()) && uiCtx.getKeyDown(action.hotkey)) {
+      action.action()
+    }
+  })
 }
 
 function handleClick(uiCtx: UICtx) {

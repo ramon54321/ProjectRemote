@@ -25,3 +25,7 @@ canvas {
 #toolbar button:first-child {
   margin-top: 0;
 }
+
+.action-hint {
+  padding-left: 8px;
+}

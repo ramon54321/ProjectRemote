@@ -3,7 +3,7 @@ import { Vec2 } from '@shared'
 
 type ToolbarTag = 'Main' | 'Build' | 'Entity'
 type CheckboxTag = 'WorldSurface' | 'Heat' | 'Entities'
-type ToolbarAction = { text: string, onClick: () => void, condition?: () => boolean}
+type ToolbarAction = { text: string, hotkey: string, action: () => void, condition?: () => boolean}
 
 export class Toolbar {
   private readonly uiCtx: UICtx
@@ -12,13 +12,15 @@ export class Toolbar {
     Main: [
       {
         text: 'Build',
-        onClick: () => this.setToolbar('Build'),
+        hotkey: 'b',
+        action: () => this.setToolbar('Build'),
       },
     ],
     Entity: [
       {
         text: 'Move',
-        onClick: () =>
+        hotkey: 'm',
+        action: () =>
           this.uiCtx.callbacks.pushClick('TileSelect', (tilePosition: Vec2) =>
             this.uiCtx.sendRequest({
               type: 'Move',
@@ -36,7 +38,8 @@ export class Toolbar {
     Build: [
       {
         text: 'Barracks',
-        onClick: () =>
+        hotkey: 'b',
+        action: () =>
           this.uiCtx.sendRequest({
             type: 'Build',
             payload: {
@@ -46,7 +49,8 @@ export class Toolbar {
       },
       {
         text: 'House',
-        onClick: () =>
+        hotkey: 'h',
+        action: () =>
           this.uiCtx.sendRequest({
             type: 'Build',
             payload: {
@@ -56,7 +60,8 @@ export class Toolbar {
       },
       {
         text: 'Back',
-        onClick: () => this.setToolbar('Main'),
+        hotkey: 'q',
+        action: () => this.setToolbar('Main'),
       },
     ],
   }
@@ -80,6 +85,9 @@ export class Toolbar {
   }
   isChecked(checkbox: CheckboxTag): boolean {
     return this.checkboxMap[checkbox].checked
+  }
+  getActiveActions(): ToolbarAction[] {
+    return this.toolbarMap[this.currentToolbarTag]
   }
   private initPromptDiv() {
     this.setToolbar('Main')
@@ -141,16 +149,16 @@ export class Toolbar {
   }
   private setToolbarActions(actions: ToolbarAction[]) {
     clearElement(this.buttonsDiv)
-    const buttons = actions.filter(action => !action.condition || action.condition()).map(action => createButton(action.text, action.onClick))
-    buttons.forEach(button => this.buttonsDiv.appendChild(button))
+    const hints = actions.filter(action => !action.condition || action.condition()).map(action => createActionHint(`${action.hotkey.toUpperCase()} - ${action.text}`))
+    hints.forEach(hint => this.buttonsDiv.appendChild(hint))
   }
 }
 
-function createButton(text: string, onClick: () => void): HTMLButtonElement {
-  const button = document.createElement('button')
-  button.textContent = text
-  button.onclick = onClick
-  return button
+function createActionHint(text: string): HTMLElement {
+  const hint = document.createElement('div')
+  hint.classList.add('action-hint')
+  hint.textContent = text
+  return hint
 }
 
 function clearElement(element: HTMLElement) {

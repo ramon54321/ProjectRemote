@@ -129,7 +129,6 @@ export class UICtx {
   }
 
   private setCanvasDimensions(canvas: HTMLCanvasElement) {
-    console.log('Setting canvas size')
     this.canvasWidthPx = window.innerWidth
     this.canvasHeightPx = window.innerHeight
     canvas.width = this.canvasWidthPx * 2
@@ -151,7 +150,6 @@ export class UICtx {
 
     const leftTopContainer = document.createElement('div')
     leftTopContainer.id = 'leftTopContainer'
-    leftTopContainer.style.backgroundColor = '#AA2222'
     leftTopContainer.style.position = 'fixed'
     leftTopContainer.style.left = '0'
     leftTopContainer.style.top = '0'
