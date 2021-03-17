@@ -117,6 +117,10 @@ export class UICtx {
   getCameraPosition(): Vec2 {
     return { x: this.cameraPositionPx.x, y: this.cameraPositionPx.y }
   }
+  setCameraPosition(position: Vec2) {
+    this.cameraPositionPx.x = position.x
+    this.cameraPositionPx.y = position.y
+  }
   moveCameraX(x: number, delta: number) {
     this.cameraPositionPx.x += x * delta
     this.events.emit('moveCamera')
@@ -202,8 +206,8 @@ export class UICtx {
       y: 0,
     }
     this.mousePositionTile = {
-      x: 0,
-      y: 0,
+      x: -9999,
+      y: -9999,
     }
     this.mousePositionTileLast = {
       x: 0,
@@ -223,8 +227,8 @@ export class UICtx {
     }
 
     const updateMouseTilePosition = () => {
-      this.mousePositionTile.x = Math.floor((this.mousePositionPx.x + this.cameraPositionPx.x) / this.tilePx)
-      this.mousePositionTile.y = Math.floor((this.canvasHeightPx - (this.mousePositionPx.y + this.cameraPositionPx.y)) / this.tilePx)
+      this.mousePositionTile.x = Math.floor((this.mousePositionPx.x + this.cameraPositionPx.x - this.canvasWidthPx / 2) / this.tilePx)
+      this.mousePositionTile.y = Math.floor((this.canvasHeightPx - (this.mousePositionPx.y + this.cameraPositionPx.y + this.canvasHeightPx / 2)) / this.tilePx)
       this.events.emit('mousePositionTileUpdate', this.mousePositionTile)
     }
 

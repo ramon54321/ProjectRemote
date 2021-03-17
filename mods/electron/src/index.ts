@@ -11,6 +11,7 @@ const uiCtx = new UICtx(start, update, draw)
 
 function start() {
   uiCtx.setIsDebugMode(false)
+  setInitialCameraPosition(uiCtx)
 }
 
 function update(delta: number) {
@@ -26,6 +27,16 @@ function draw(state: NetworkState) {
   drawHoverTile(uiCtx)
   if (uiCtx.getIsDebugMode() && uiCtx.toolbar.isChecked('Heat')) drawHeat(uiCtx, state)
   if (!uiCtx.getIsDebugMode() || uiCtx.toolbar.isChecked('Entities')) drawEntities(uiCtx, state)
+}
+
+///////////////////////////
+// Individual Operations //
+///////////////////////////
+
+function setInitialCameraPosition(uiCtx: UICtx) {
+  const xOffsetPx = (uiCtx.getNetworkState().worldState.heatGrid.width * uiCtx.tilePx) / 2
+  const yOffsetPx = -(uiCtx.getNetworkState().worldState.heatGrid.height * uiCtx.tilePx) / 2
+  uiCtx.setCameraPosition({x: xOffsetPx, y: yOffsetPx})
 }
 
 function handleDebugMode(uiCtx: UICtx) {
