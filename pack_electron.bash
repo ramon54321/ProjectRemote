@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-rm -rf dist/electron
+rm -rf dist
 npm run build
 npm --prefix mods/electron install
 electron-packager mods/electron remote --out dist/electron --overwrite
@@ -19,3 +19,5 @@ mkdir -p dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/
 cp -r mods/serialization/dist dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/serialization
 mkdir -p dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/sync
 cp -r mods/sync/dist dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/sync
+mkdir -p dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/ecs
+cp -r mods/ecs/dist dist/electron/remote-darwin-x64/remote.app/Contents/Resources/app/mods/ecs

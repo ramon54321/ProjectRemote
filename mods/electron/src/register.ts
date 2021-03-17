@@ -14,6 +14,7 @@ const modules = fs.existsSync(checkPath)
       '@events': path.join(__dirname, '../mods/events/dist'),
       '@serialization': path.join(__dirname, '../mods/serialization/dist'),
       '@sync': path.join(__dirname, '../mods/sync/dist'),
+      '@ecs': path.join(__dirname, '../mods/ecs/dist'),
     }
   : {
       '@core': path.join(__dirname, '../../core/dist'),
@@ -23,5 +24,6 @@ const modules = fs.existsSync(checkPath)
       '@events': path.join(__dirname, '../../events/dist'),
       '@serialization': path.join(__dirname, '../../serialization/dist'),
       '@sync': path.join(__dirname, '../../sync/dist'),
+      '@ecs': path.join(__dirname, '../../ecs/dist'),
     }
 moduleAlias.addAliases(modules)
