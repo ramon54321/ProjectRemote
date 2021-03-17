@@ -17,7 +17,7 @@ export class StatePlay extends State<States> {
   private playEvents!: Events<PlayEvents>
   private logicCore!: LogicCore
   private tickHandle: any
-  private tickDeltaSeconds: number = 1
+  private tickDeltaSeconds: number = 1 / 4
   async onEnter(): Promise<ExtendedStates<States>> {
     console.log('Entering play')
     this.state = new NetworkState('WRITER')

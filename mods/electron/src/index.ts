@@ -18,7 +18,6 @@ function update(delta: number) {
   handleSetActionStateToEntity(uiCtx)
   handleToolbarHotkeys(uiCtx)
   handleClick(uiCtx)
-  handleSpacebar(uiCtx)
   handleCamera(delta, uiCtx)
 }
 
@@ -44,15 +43,16 @@ function handleSetActionStateToEntity(uiCtx: UICtx) {
 
 function handleToolbarHotkeys(uiCtx: UICtx) {
   const activeActions = uiCtx.toolbar.getActiveActions()
+  if (!activeActions) return
   activeActions.forEach((action) => {
-    if ((!action.condition || action.condition()) && uiCtx.getKeyDown(action.hotkey)) {
+    if ((!action.condition || action.condition()) && uiCtx.getKeyOnce(action.hotkey)) {
       action.action()
     }
   })
 }
 
 function handleClick(uiCtx: UICtx) {
-  if (uiCtx.getKeyDown('click')) {
+  if (uiCtx.getKeyOnce('click')) {
     if (uiCtx.callbacks.isDirtyClick()) {
       const hover = Utils.getHover(uiCtx)
       uiCtx.callbacks.popClick()!.func(uiCtx.getMousePositionTile(), hover.entity)
@@ -67,12 +67,6 @@ function handleClick(uiCtx: UICtx) {
       }
       uiCtx.flagRedraw()
     }
-  }
-}
-
-function handleSpacebar(uiCtx: UICtx) {
-  if (uiCtx.getKeyOnce(' ') && uiCtx.isActionState('Entity')) {
-    uiCtx.events.emit('promptEntity')
   }
 }
 

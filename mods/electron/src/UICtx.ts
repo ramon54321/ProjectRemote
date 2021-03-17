@@ -13,8 +13,8 @@ interface UIEvents {
   selectTile: void
   mousePositionPxUpdate: Vec2
   mousePositionTileUpdate: Vec2
-  promptEntity: void
   debugToggle: boolean
+  slowTick: void
 }
 
 type ActionState = 'Select' | 'Entity'
@@ -22,6 +22,10 @@ type ActionState = 'Select' | 'Entity'
 export class UICtx {
   private isInitDone = false
   private isDebugMode = false
+
+  private secCurDraws = 0
+  private secLastDraws = 0
+
   canvasWidthPx!: number
   canvasHeightPx!: number
   readonly tilePx: number
@@ -49,6 +53,10 @@ export class UICtx {
   readonly callbacks: Callbacks
   readonly toolbar: Toolbar
   readonly entityManager: EntityManager
+
+  getDrawsPerSecond(): number {
+    return this.secLastDraws
+  }
 
   getIsDebugMode(): boolean {
     return this.isDebugMode
@@ -232,7 +240,7 @@ export class UICtx {
 
     canvas.onmousemove = onMouseMove
 
-    this.callbacks = new Callbacks()
+    this.callbacks = new Callbacks(this)
     this.toolbar = new Toolbar(this)
     this.entityManager = new EntityManager(this)
 
@@ -258,14 +266,22 @@ export class UICtx {
       replaceObject(this.mousePositionTileLast, this.mousePositionTile)
     }, 1000 / 60)
 
+    setInterval(() => {
+      this.secLastDraws = this.secCurDraws
+      this.secCurDraws = 0
+      this.events.emit('slowTick')
+    }, 1000)
+
     this.networkState = {} as NetworkState
     const drawWrapper = (state: NetworkState) => {
+      this.secCurDraws++
       this.networkState = state
       this.events.emit('networkStateUpdate', state)
       this.dom.context.clearRect(0, 0, this.canvasWidthPx, this.canvasHeightPx)
       draw(state)
       this.isInitDone = true
     }
+
     this.triggerDraw = () => drawWrapper(this.networkState)
     const { sendRequest } = open(drawWrapper)
     this.sendRequest = sendRequest

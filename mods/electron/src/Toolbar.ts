@@ -1,21 +1,14 @@
 import { UICtx } from './UICtx'
 import { Vec2 } from '@shared'
 
-type ToolbarTag = 'Main' | 'Build' | 'Entity'
+type ToolbarTag = 'Entity'
 type CheckboxTag = 'WorldSurface' | 'Heat' | 'Entities'
 type ToolbarAction = { text: string, hotkey: string, action: () => void, condition?: () => boolean}
 
 export class Toolbar {
   private readonly uiCtx: UICtx
-  private currentToolbarTag!: ToolbarTag
+  private currentToolbarTag?: ToolbarTag
   private readonly toolbarMap: Record<ToolbarTag, ToolbarAction[]> = {
-    Main: [
-      {
-        text: 'Build',
-        hotkey: 'b',
-        action: () => this.setToolbar('Build'),
-      },
-    ],
     Entity: [
       {
         text: 'Move',
@@ -35,35 +28,6 @@ export class Toolbar {
         }
       },
     ],
-    Build: [
-      {
-        text: 'Barracks',
-        hotkey: 'b',
-        action: () =>
-          this.uiCtx.sendRequest({
-            type: 'Build',
-            payload: {
-              building: 'Barracks',
-            },
-          }),
-      },
-      {
-        text: 'House',
-        hotkey: 'h',
-        action: () =>
-          this.uiCtx.sendRequest({
-            type: 'Build',
-            payload: {
-              building: 'House',
-            },
-          }),
-      },
-      {
-        text: 'Back',
-        hotkey: 'q',
-        action: () => this.setToolbar('Main'),
-      },
-    ],
   }
   private readonly buttonsDiv: HTMLDivElement
   private readonly settingsDiv: HTMLDivElement
@@ -76,33 +40,35 @@ export class Toolbar {
     this.uiCtx.dom.toolbar.appendChild(this.buttonsDiv)
     this.uiCtx.dom.toolbar.appendChild(this.settingsDiv)
     this.initInfoDiv()
-    this.initPromptDiv()
     this.checkboxMap = {
       WorldSurface: this.createCheckbox('WorldSurface', true),
       Heat: this.createCheckbox('Heat'),
       Entities: this.createCheckbox('Entities', true),
     }
+    this.uiCtx.events.on('selectEntity', () => this.setToolbar('Entity'))
+    this.uiCtx.events.on('selectTile', () => this.setToolbar())
   }
   isChecked(checkbox: CheckboxTag): boolean {
     return this.checkboxMap[checkbox].checked
   }
-  getActiveActions(): ToolbarAction[] {
-    return this.toolbarMap[this.currentToolbarTag]
-  }
-  private initPromptDiv() {
-    this.setToolbar('Main')
-    this.uiCtx.events.on('promptEntity', () => (this.currentToolbarTag !== 'Entity' ? this.setToolbar('Entity') : this.setToolbar('Main')))
+  getActiveActions(): ToolbarAction[] | undefined {
+    return this.currentToolbarTag && this.toolbarMap[this.currentToolbarTag]
   }
   private initInfoDiv() {
     const infoDiv = document.createElement('div')
     this.registerAsDebugElement(infoDiv)
     this.uiCtx.dom.toolbar.appendChild(infoDiv)
+    const secDrawDiv = document.createElement('div')
     const mousePositionPxDiv = document.createElement('div')
     const mousePositionTileDiv = document.createElement('div')
     const selectedDiv = document.createElement('div')
+    infoDiv.appendChild(secDrawDiv)
     infoDiv.appendChild(mousePositionPxDiv)
     infoDiv.appendChild(mousePositionTileDiv)
     infoDiv.appendChild(selectedDiv)
+    this.uiCtx.events.on('slowTick', () => {
+      secDrawDiv.innerHTML = this.uiCtx.getDrawsPerSecond().toFixed(0)
+    })
     this.uiCtx.events.on('mousePositionPxUpdate', (mousePositionPx: any) => {
       mousePositionPxDiv.innerHTML = JSON.stringify(mousePositionPx)
     })
@@ -143,12 +109,19 @@ export class Toolbar {
       }
     })
   }
-  private setToolbar(tag: ToolbarTag) {
+  private setToolbar(tag?: ToolbarTag) {
     this.currentToolbarTag = tag
-    this.setToolbarActions(this.toolbarMap[tag])
+    if (this.currentToolbarTag) {
+      this.setToolbarActions(this.toolbarMap[this.currentToolbarTag])
+    } else {
+      this.clearToolbarActions()
+    }
+  }
+  private clearToolbarActions() {
+    clearElement(this.buttonsDiv)
   }
   private setToolbarActions(actions: ToolbarAction[]) {
-    clearElement(this.buttonsDiv)
+    this.clearToolbarActions()
     const hints = actions.filter(action => !action.condition || action.condition()).map(action => createActionHint(`${action.hotkey.toUpperCase()} - ${action.text}`))
     hints.forEach(hint => this.buttonsDiv.appendChild(hint))
   }
